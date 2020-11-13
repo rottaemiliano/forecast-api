@@ -3,12 +3,14 @@ import sqlite3
 
 import requests
 from flask import Flask, request, json
-from forecast import app
+
+app = Flask(__name__)
+
 
 def db_connection():
     conn = None
     try:
-        conn = sqlite3.connect("../resources/sqlite/database.sqlite")
+        conn = sqlite3.connect("../../resources/sqlite/database.sqlite")
     except sqlite3.error as e:
         print(e)
     return conn
@@ -54,7 +56,7 @@ def cidade():
         forecast_json = extract_city_data(city_id)
 
         if 'error' in forecast_json or int(forecast_json['id']) != city_id:
-            return 'City ' + city_id.__str__() + ' nao encontrada', 404
+            return 'Cidade ' + city_id.__str__() + ' nao encontrada', 400
 
     else:
         return 'Erro: Id informado invalido', 404
@@ -64,7 +66,8 @@ def cidade():
         return 'Cidade id: ' + city_id.__str__() + ' registrada com sucesso', 201
 
     except Exception as e:
-        return f'Erro: {e}', 422
+        return f'Erro: {e}', 400
+
 
 @app.route("/analise", methods=["GET"])
 def analise():
@@ -72,7 +75,6 @@ def analise():
     end_date = request.args['data_final']
 
     analise_jason = {}
-
 
     conn = db_connection()
     cursor = conn.cursor()
@@ -87,7 +89,7 @@ def analise():
                    (initial_date, end_date))
 
     rows = cursor.fetchall()
-    if rows != []:
+    if rows:
         analise_jason['max_temperature_city_id'] = rows[0][0]
         analise_jason['max_temperature_city_name'] = rows[0][1]
 
@@ -101,7 +103,7 @@ def analise():
 
     rows = cursor.fetchall()
 
-    if rows != []:
+    if rows:
         analise_jason['average_precipitation'] = []
         for row in rows:
             analise_jason['average_precipitation'].append({"city_id": row[0], "avg": row[1]})
@@ -109,3 +111,7 @@ def analise():
     json_data = json.dumps(analise_jason)
     return json_data, 200
 
+
+if __name__ == "__main__":
+    app.config["DEBUG"] = False
+    app.run(host='localhost', port=5000)
