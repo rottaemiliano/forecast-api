@@ -22,7 +22,8 @@ class ForecastDAO():
         city_name = json['name']
         state = json['state']
         country = json['country']
-        sql = """INSERT INTO city (id, city_name, state, country) VALUES (?, ?, ?, ?)"""
+
+        sql = """INSERT OR REPLACE INTO city (id, city_name, state, country) VALUES (?, ?, ?, ?)"""
         cursor.execute(sql, (city_id, city_name, state, country))
 
         for forecast_data in json['data']:
@@ -31,13 +32,13 @@ class ForecastDAO():
             precipitation = forecast_data['rain']['precipitation']
             temperature_min = forecast_data['temperature']['min']
             temperature_max = forecast_data['temperature']['max']
-            sql = """INSERT INTO forecast_data (city_id, forecast_date, probability, precipitation, temperature_min, temperature_max)
+            sql = """INSERT OR REPLACE INTO forecast_data (city_id, forecast_date, probability, precipitation, temperature_min, temperature_max)
                                       VALUES (?, ?, ?, ?, ?, ?)"""
             cursor.execute(sql, (city_id, forecast_date, probability, precipitation, temperature_min, temperature_max))
 
         conn.commit()
 
-    def persist_forecast_data(initial_date, end_date):
+    def retrieve_forecast_data(initial_date, end_date):
         analise_jason = {}
 
         conn = db_connection()

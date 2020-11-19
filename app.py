@@ -1,5 +1,5 @@
 from flask import Flask
-from app.controller.forecast_controller import forecast_controller
+from src.controller.forecast_controller import forecast_controller
 
 app = Flask(__name__)
 

@@ -2,7 +2,7 @@ import json
 
 from flask import Blueprint
 from flask import request, json
-from app import forecast_dao, forecast_service
+from src import forecast_dao, forecast_service
 
 forecast_controller = Blueprint('account_api', __name__)
 fs = forecast_service.ForecastService
@@ -34,7 +34,7 @@ def analise():
     initial_date = request.args['data_inicial']
     end_date = request.args['data_final']
 
-    analise_jason = fd.persist_forecast_data(initial_date, end_date)
+    analise_jason = fd.retrieve_forecast_data(initial_date, end_date)
 
     json_data = json.dumps(analise_jason)
     return json_data, 200
